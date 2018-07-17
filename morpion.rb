@@ -54,9 +54,9 @@ class Board
 		3.times do |col|
 	        var_verif = 0
 	        2.times do |ligne|
-	            if @tab_case[col][ligne].value == nil
+	            if @tab_case[ligne][col].value == nil
 	            	print "-> nul |"
-	            elsif !(@tab_case[col][ligne].value == @tab_case[col+1][ligne].value)
+	            elsif !(@tab_case[ligne][col].value == @tab_case[ligne+1][col].value)
 	                print "->pas egaux |"
 	                # break
 	            else
@@ -69,7 +69,25 @@ class Board
 	        	puts " tab[#{ligne}][#{col}] et tab[#{ligne+1}][#{col}]"
 	            # puts "VAR VERIF: #{var_verif}"
 	        end
-	    end	    
+	    end
+
+	    #VERIF DIAGONALE
+		puts "verif DIAGONALE:"
+		# pas une diagonale de nil
+		if @tab_case[1][1].value !=nil
+			#diago1
+			if @tab_case[0][0].value == @tab_case[1][1].value && @tab_case[1][1].value == @tab_case[2][2].value
+				puts "SUCCESS DIAGONALE 1"
+				return true
+			#diago2
+			elsif @tab_case[0][2].value == @tab_case[1][1].value && @tab_case[1][1].value == @tab_case[2][0].value
+				puts "SUCCESS DIAGONALE 2"
+				return true
+			else
+				puts "ECHEC DIAGONALE"
+			end
+		end
+	    
 	    return false
 	end
 
@@ -169,6 +187,7 @@ class Game
 			a.set_case(@joueur1.get_forme)
 
 			# AFFICHAGE MORPION
+			@plateau.affichage		
 			puts "Fonction verif tab: "	
 			if @plateau.verif == true
 				puts "\tSUCCES !"
