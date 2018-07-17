@@ -10,9 +10,9 @@ class Board
 	end
 
 	def affichage
-		puts "-"*13
+		print "\t",  "-"*13, "\n"
 		3.times do |x|
-			print "| "
+			print "\t| "
 			3.times do |y|
 				if @tab_case[x][y].value==nil
 					print ". | "
@@ -21,70 +21,59 @@ class Board
 				end
 			end
 			puts
-			puts "-"*13
+			print "\t",  "-"*13, "\n"
 		end
 	end
 
 	def verif
 		# VERIF LIGNE
-		puts "Verif LIGNE: "
 		3.times do |ligne|
 	        var_verif = 0
 	        2.times do |col|
 	            if @tab_case[ligne][col].value == nil
-	            	print "-> nul |"
+	            	# print "-> nul |"
 	            elsif !(@tab_case[ligne][col].value == @tab_case[ligne][col+1].value)
-	                print "->pas egaux |"
+	                # print "->pas egaux |"
 	                # break
 	            else
 	                var_verif += 1
 	            end
 	            if var_verif == 2
-	                puts "succes de votre ligne"
-	                return true #SUCCESSS D'UNE LIGNE
+	                return true 
 	            end
-	        	puts " tab[#{ligne}][#{col}] et tab[#{ligne}][#{col+1}]"
-	            # puts "VAR VERIF: #{var_verif}"
 	        end
 	    end
 
 		# VERIF COLONNE
 		puts
-		puts "verif COLONNE:"
 		3.times do |col|
 	        var_verif = 0
 	        2.times do |ligne|
 	            if @tab_case[ligne][col].value == nil
-	            	print "-> nul |"
+	            	# print "-> nul |"
 	            elsif !(@tab_case[ligne][col].value == @tab_case[ligne+1][col].value)
-	                print "->pas egaux |"
+	                # print "->pas egaux |"
 	                # break
 	            else
 	                var_verif += 1
 	            end
 	            if var_verif == 2
-	                puts "succes de votre colonne"
-	                return true #SUCCESSS D'UNE COLONNE
+	                # puts "SUCCES DE VOTRE COLONNE"
+	                return true
 	            end
-	        	puts " tab[#{ligne}][#{col}] et tab[#{ligne+1}][#{col}]"
-	            # puts "VAR VERIF: #{var_verif}"
 	        end
 	    end
 
 	    #VERIF DIAGONALE
-		puts "verif DIAGONALE:"
+
 		# pas une diagonale de nil
 		if @tab_case[1][1].value !=nil
 			#diago1
 			if @tab_case[0][0].value == @tab_case[1][1].value && @tab_case[1][1].value == @tab_case[2][2].value
-				puts "SUCCESS DIAGONALE 1"
 				return true
 			#diago2
 			elsif @tab_case[0][2].value == @tab_case[1][1].value && @tab_case[1][1].value == @tab_case[2][0].value
-				puts "SUCCESS DIAGONALE 2"
 				return true
-			else
-				puts "ECHEC DIAGONALE"
 			end
 		end
 	    
@@ -152,30 +141,50 @@ class Game
 	def choix_position
 		ligne = 0
 		colonne = 0
+		
+		# tant que le user ne rentre pas une position possible
+		loop do 
+			# tant que le user ne rentre pas une position existante
+			while ligne > 3 || ligne < 1
+				ligne = 0
+				colonne = 0		
+				print "Choisir ligne entre 1 et 3 -> "
+				ligne = gets.chomp.to_i
+			end 
+			while colonne > 3 || colonne < 1
+				print "Choisir colonne entre 1 et 3 -> "
+				colonne = gets.chomp.to_i
+			end
+			# A SUPPRIMER APRES
+			ligne -= 1
+			colonne -= 1
 
-		while ligne > 3 || ligne < 1
-			print "Choisir ligne entre 1 et 3: "
-			ligne = gets.chomp.to_i
-		end 
-		while colonne > 3 || colonne < 1
-			print "Choisir colonne entre 1 et 3: "
-			colonne = gets.chomp.to_i
+			break if @plateau.get_tab[ligne][colonne].value==nil
 		end
-		# A SUPPRIMER APRES
-		puts ligne -= 1
-		puts colonne -= 1
 
-		if @plateau.get_tab[ligne][colonne].value != nil
-			return "EMPLACEMENT DEJA PRIS"
-		end
 		return @plateau.get_tab[ligne][colonne]
 	end
 
 
+	def end_game
+		fin = false
+		3.times do |ligne|
+			3.times do |colonne|
+				if @plateau.get_tab[ligne][colonne].value == nil
+					return fin = false
+				end
+			end
+		end
+		return true				
+	end
+
 	def main
 		5.times do |tour|
 			# TOUR JOUEUR 1
-			puts 
+			puts
+			@plateau.affichage
+			puts
+			puts
 			print "\t" , "-"*12, "\n"
 			puts "\t|  JOUEUR 1 : #{@joueur1.get_pseudo}"
 			print "\t" , "-"*12, "\n"
@@ -187,41 +196,54 @@ class Game
 			a.set_case(@joueur1.get_forme)
 
 			# AFFICHAGE MORPION
-			@plateau.affichage		
-			puts "Fonction verif tab: "	
+			@plateau.affichage
+			# VERIFIE VICTOIRE
 			if @plateau.verif == true
-				puts "\tSUCCES !"
+				puts "-"*23
+				puts "| VICTOIRE du joueur1 |"
+				puts "|\tCONGRATZ      |"
+				puts "-"*23
 				return true
 			end
 			puts
 
-
-			if tour == 5
-				break
+			# FIN DE JEU(?) = égalité
+			if end_game == true
+				puts "-"*19
+				puts "| END OF THE GAME |"
+				puts "|-- It's a draw --|"
+				puts "-"*19
+				return false
 			end
+			# if tour == 4
+			# 	puts "CEST FINI TROP DE TOUR\nTROPPPPPP	"
+			# 	return true
+			# end
+
 			# TOUR JOUEUR 2
 			print "\t" , "-"*12, "\n"
 			puts "\t|  JOUEUR 2 : #{@joueur2.get_pseudo}"
 			print "\t" , "-"*12, "\n"
-			begin
-				a = choix_position
-				while a=="EMPLACEMENT DEJA PRIS"
-					puts "Emplacement déjà pris ... Recommencez"
-					a=choix_position
-				end
-				# break unless a==nil
-			end while (a==nil)
+			a=choix_position
 			a.set_case(@joueur2.get_forme)
 
 			# AFFICHAGE MORPION
-			@plateau.affichage		
+			@plateau.affichage
+			# VERIFIE VICTOIRE	
 			if @plateau.verif == true
-				puts "\tSUCCES !"
+				puts "-"*23
+				puts "| VICTOIRE du joueur2 |"
+				puts "|\tCONGRATZ      |"
+				puts "-"*23
 				return true
 			end
+
 		end
 	end
 end
+
+#return TRUE = VICTOIRE
+#return FALSE = EGALITE
 
 #####################################################
 jeu = Game.new()
